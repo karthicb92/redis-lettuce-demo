@@ -6,7 +6,6 @@ import com.practice.redisdemo.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -15,13 +14,19 @@ public class EmployeeService {
     @Autowired
     private EmployeeDao dao;
 
-    public boolean saveEmp(Employee emp) throws ExecutionException, InterruptedException, JsonProcessingException {
-        return dao.saveEmpToDB(emp);
-
+    public void saveEmp(Employee emp) throws ExecutionException, InterruptedException, JsonProcessingException {
+        dao.saveEmpToDB(emp);
     }
 
-    public List<Employee> getAllEmp() throws ExecutionException, InterruptedException {
-        return dao.getAllEmpFromDB();
+    public void saveEmpWithExpiry(Employee emp, long expiry) throws ExecutionException, InterruptedException, JsonProcessingException {
+        dao.saveEmpToDBWithExpiry(emp, expiry);
+    }
 
+    public Employee getEmpById(String id) throws ExecutionException, InterruptedException, JsonProcessingException {
+        return dao.getEmpFromDB(id);
+    }
+
+    public void deleteEmpById(String id) throws ExecutionException, InterruptedException {
+        dao.deleteEmpToDB(id);
     }
 }

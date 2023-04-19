@@ -7,9 +7,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 
 @Repository
@@ -21,20 +19,20 @@ public class EmployeeDao {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public Boolean saveEmpToDB(Employee emp) throws ExecutionException, InterruptedException, JsonProcessingException {
-        return asyncCommands.hset("EMP", String.valueOf(emp.getId()), objectMapper.writeValueAsString(emp)).get();
+    public void saveEmpToDB(Employee emp) throws ExecutionException, InterruptedException, JsonProcessingException {
+        asyncCommands.set(String.valueOf(emp.getId()), objectMapper.writeValueAsString(emp)).get();
     }
 
-    public List<Employee> getAllEmpFromDB() throws ExecutionException, InterruptedException {
-        Map<String, String>  empMap = asyncCommands.hgetall("EMP").get();
-        List<Employee> empList = new ArrayList<>();
-        empMap.entrySet().stream().forEach(es -> {
-            try {
-                empList.add(objectMapper.readValue(es.getValue(), Employee.class));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        return empList;
+    public void saveEmpToDBWithExpiry(Employee emp, long expiry) throws ExecutionException, InterruptedException, JsonProcessingException {
+        asyncCommands.set(String.valueOf(emp.getId()), objectMapper.writeValueAsString(emp)).get();
+        asyncCommands.expire(String.valueOf(emp.getId()), Duration.ofMillis(expiry));
+    }
+
+    public Employee getEmpFromDB(String id) throws ExecutionException, InterruptedException, JsonProcessingException {
+        return objectMapper.readValue(asyncCommands.get(id).get(), Employee.class);
+    }
+
+    public void deleteEmpToDB(String id) throws ExecutionException, InterruptedException {
+        asyncCommands.del(id).get();
     }
 }
