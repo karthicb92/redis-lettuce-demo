@@ -33,7 +33,6 @@ public class EmployeeDao {
     }
 
     public void deleteEmpToDB(String id) throws ExecutionException, InterruptedException {
-        long result =  asyncCommands.del(id).get();
-        System.out.println("delete res-"+result);
+        asyncCommands.del(id).get();
     }
 }

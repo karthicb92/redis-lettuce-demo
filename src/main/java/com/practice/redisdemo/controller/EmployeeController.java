@@ -50,7 +50,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/emp/{id}")
-    public ResponseEntity<String> deleteEmpById(String id) {
+    public ResponseEntity<String> deleteEmpById(@PathVariable String id) {
         try {
             empService.deleteEmpById(id);
             return ResponseEntity.ok("Deleted successfully!!!");
